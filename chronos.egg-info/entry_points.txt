@@ -1,0 +1,2 @@
+[console_scripts]
+chronos = pipeline.cli:app
