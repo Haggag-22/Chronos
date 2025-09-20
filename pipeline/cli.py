@@ -6,7 +6,7 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 import json
 
 # Import utils
-from pipeline.parsers import disk, registry_ttest
+from pipeline.parsers import disk, registry_ttest, registry
 from pipeline.utils.hashing import hash_file_sha256
 from pipeline.utils.manifest import write_manifest
 from pipeline.utils.detect import detect_evidence_type
@@ -59,6 +59,7 @@ def analyze(
                 from pipeline.parsers import mft, prefetch
                 events.extend(mft.parse(evidence))
                 events.extend(registry_ttest.parse(evidence))
+                events.extend(registry.parse(evidence))  # MITRE ATT&CK registry analysis
                 events.extend(prefetch.parse(evidence))
                 events.extend(disk.parse(evidence))
             elif evidence_type == "Memory Dump":
