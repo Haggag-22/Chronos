@@ -1,1 +1,3 @@
-./chronos.egg-info
+*.egg-info/
+dist/
+build/
