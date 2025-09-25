@@ -1,8 +1,0 @@
-{
-  "case_id": "test01",
-  "evidence_path": "C:\\Temp\\SYSTEM.DAT",
-  "analysis_timestamp": "2025-09-25T03:26:34.026189",
-  "output_directory": "C:\\Users\\Owner\\OneDrive\\Desktop\\Chronos\\pipeline\\chronos_output\\test01",
-  "format": "json",
-  "status": "completed"
-}

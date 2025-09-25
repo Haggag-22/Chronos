@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "chronos"
 version = "0.1.0"
 description = "Artifact Pipeline Platform for automated forensic analysis"
-authors = [{name = "Chronos Team", email = "team@chronos.dfir"}]
+authors = [{ name = "Chronos Team", email = "team@chronos.dfir" }]
 readme = "README.md"
 requires-python = ">=3.11"
 classifiers = [
@@ -73,8 +73,9 @@ dev = [
     "mypy>=1.7.0",
 ]
 
+# CLI entrypoint
 [project.scripts]
-chronos = "pipeline.cli:app"
+chronos = "pipeline.chronos:app"
 
 [tool.setuptools.packages.find]
 where = ["."]

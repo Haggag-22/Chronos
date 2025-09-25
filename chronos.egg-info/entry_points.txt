@@ -1,2 +1,2 @@
 [console_scripts]
-chronos = pipeline.cli:app
+chronos = pipeline.chronos:app

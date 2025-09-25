@@ -5,11 +5,24 @@ from typing import Optional, List
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-# Import utils
-from utils.hashing import hash_file_sha256
-from utils.manifest import write_manifest
-from utils.detect import detect_evidence_type
-from utils.evidence import show_evidence_info, generate_results
+from pipeline.ingest import (
+    detect_evidence_type,
+    hash_file_sha256,
+    format_size,
+    show_evidence_info,
+    write_manifest,
+    generate_results,
+    ingest_evidence,
+)
+
+# Import parser functions directly
+from pipeline.parsers import (
+    parse_registry,
+    parse_mft,
+    parse_prefetch,
+    parse_memory,
+    parse_disk,
+)
 
 app = typer.Typer(name="chronos", add_completion=False)
 console = Console()
@@ -55,27 +68,28 @@ def analyze(
         task = progress.add_task("Analyzing evidence...", total=None)
 
         try:
-            # 1. Ingest: hash + manifest
-            size_bytes = evidence.stat().st_size
-            evidence_type = detect_evidence_type(evidence)
-            sha256_hex = hash_file_sha256(evidence)
-            write_manifest(case_id, output_dir, evidence, evidence_type, size_bytes, sha256_hex)
+            # 1. Ingest evidence (hash, manifest, metadata)
+            metadata = ingest_evidence(case_id, evidence, output_dir)
+            evidence_type = metadata["evidence_type"]
 
-            # 2. Parsers dispatch
+            # 2. Parser dispatch
             events = []
-            parsers = {
-                "Disk Image": "pipeline.parsers.disk",
-                "Memory Dump": "pipeline.parsers.memory",
-                "Hive": "pipeline.parsers.registry",
-                "MFT": "pipeline.parsers.mft",
-                "Prefetch": "pipeline.parsers.prefetch",
-            }
-
-            if evidence_type in parsers:
-                module = __import__(parsers[evidence_type], fromlist=["parse"])
-                events.extend(module.parse(evidence))
+            if evidence_type == "Disk":
+                events.extend(parse_disk(evidence))
+            elif evidence_type == "Memory":
+                events.extend(parse_memory(evidence))
+            elif evidence_type == "Hive":
+                events.extend(parse_registry(evidence))
+            elif evidence_type == "MFT":
+                events.extend(parse_mft(evidence))
+            elif evidence_type == "Prefetch":
+                events.extend(parse_prefetch(evidence))
             else:
-                console.print(f"[yellow]No parser available for evidence type: {evidence_type}[/yellow]")
+                console.print(f"[yellow]No parser available for {evidence_type}[/yellow]")
+
+            if not events:
+                console.print("[yellow]No events extracted from this evidence[/yellow]")
+                return
 
             # 3. Write normalized events
             events_file = write_events(case_id, output_dir, events)
