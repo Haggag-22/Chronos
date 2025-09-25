@@ -5,15 +5,15 @@ def detect_evidence_type(evidence: Path) -> str:
     if evidence.is_file():
         suffix = evidence.suffix.lower()
         if suffix in ['.img', '.dd', '.raw', '.e01', '.vmdk', '.vhd', '.vhdx']:
-            return "Disk Image"
+            return "Disk"
         elif suffix in ['.dmp', '.mem', '.vmem', '.hiberfil.sys']:
-            return "Memory Dump"
+            return "Memory"
         elif suffix in ['.dat', '.hiv', '.hive']:
-            return "Registry Hive"
+            return "Hive"
         elif suffix == '.mft':
-            return "MFT File"
+            return "MFT"
         elif suffix == '.pf':
-            return "Prefetch File"
+            return "Prefetch"
         else:
             return "Unknown File"
     elif evidence.is_dir():
